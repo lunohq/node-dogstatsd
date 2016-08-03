@@ -167,4 +167,22 @@ describe('StatsD', function() {
             });
         });
     });
+
+    describe('check', function() {
+      it('should send the minimal service check', function(done) {
+        serverShouldReceive('_sc|check.name|0', done);
+        client.check('check.name', client.CHECKS.OK);
+      });
+
+      it('should send a service check with metadata', function(done) {
+        serverShouldReceive('_sc|check.name|1|d:timestamp|h:hostname|#tag1,tag2|m:message', done);
+        var metadata = {
+          timestamp: 'timestamp',
+          hostname: 'hostname',
+          message: 'message',
+          tags: ['tag1', 'tag2'],
+        };
+        client.check('check.name', client.CHECKS.WARNING, metadata);
+      });
+    });
 });
